@@ -1,17 +1,35 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import './App.css'
-import { routes } from './utlitiy/routeConfig'
+import { useContext } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import ErrorFallback from './component/Fallback'
+import RouteContext from './context/RouteContext/RouteContext'
+import { componentMapping } from './context/RouteContext/routeConfig'
 
-function App() {
+const App = () => {
+
+  const { appRoutes } = useContext(RouteContext);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {routes?.map((route) => (
-          <Route key={route.key} path={route.path} Component={route.component} />
-        ))}
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onError={(error, info) => {
+        console.error('Caught by ErrorBoundary:', error, info);
+      }}
+    >
+      <BrowserRouter>
+        <Routes>
+          {appRoutes?.map(({ key, path, isProtected, isAllowed }) => (
+            <>
+              {!isAllowed ?
+                <Route key={key} path={path} element={<Navigate to='/un-authorised' />} />
+                : isProtected ?
+                  <Route key={key} path={path} element={<Navigate to='/login' />} />
+                  : <Route key={key} path={path} Component={componentMapping[key]} />}
+            </>
+          ))}
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
