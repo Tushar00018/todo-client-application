@@ -6,7 +6,6 @@ export const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
 });
 
 axiosInstance.interceptors.request.use(
@@ -37,8 +36,7 @@ export const loginInstance = axios.create({
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
-  },
-  withCredentials: true,
+  }
 });
 
 loginInstance.interceptors.response.use(
